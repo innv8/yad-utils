@@ -1,38 +1,50 @@
-use crate::config;
-use crate::files;
+use crate::{config, files, storage};
 use chrono::Utc;
 use reqwest::blocking::get;
 use std::{fs, io::Write, path::Path};
 
-fn download(
+pub fn download(
     file_url: &str,
     cfg: &config::Config,
 ) -> Result<files::File, Box<dyn std::error::Error>> {
     let mut file = files::File::new(file_url, cfg);
 
-    fs::create_dir_all(&file.destination_dir)?;
+    // check whether the record exists
+    match storage::search_by_url(&file.file_url, cfg) {
+        Ok(record) => {
+            println!("Found record from the db");
+            Ok(files::File::from(record))
+        }
+        Err(e) => {
+            println!("Failed to get record from db because {}", e);
+            fs::create_dir_all(&file.destination_dir)?;
 
-    // download the file
-    let now = Utc::now();
-    file.download_start_time = now.timestamp();
-    let response = get(file_url)?;
-    let content = response.bytes()?;
+            // download the file
+            let now = Utc::now();
+            file.download_start_time = now.timestamp();
+            let response = get(file_url)?;
+            let content = response.bytes()?;
 
-    // write the content to the file
-    let mut downloaded_file = fs::File::create(&file.destination_path)?;
-    downloaded_file.write_all(&content)?;
+            // write the content to the file
+            let mut downloaded_file = fs::File::create(&file.destination_path)?;
+            downloaded_file.write_all(&content)?;
 
-    let stop_time = Utc::now();
-    file.download_stop_time = stop_time.timestamp();
-    file.download_duration = stop_time.signed_duration_since(now).num_milliseconds();
+            let stop_time = Utc::now();
+            file.download_stop_time = stop_time.timestamp();
+            file.download_duration = stop_time.signed_duration_since(now).num_milliseconds();
+            let download_record = storage::DownloadRecord::from(file.clone());
 
-    let path = Path::new(&file.destination_path);
+            storage::insert_record(&download_record, &cfg)?;
 
-    file.file_size = match fs::metadata(path) {
-        Ok(metadata) => metadata.len(),
-        Err(_) => 1234,
-    };
-    Ok(file)
+            let path = Path::new(&file.destination_path);
+
+            file.file_size = match fs::metadata(path) {
+                Ok(metadata) => metadata.len(),
+                Err(_) => 1234,
+            };
+            Ok(file)
+        }
+    }
 }
 
 #[cfg(test)]

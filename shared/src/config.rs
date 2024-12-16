@@ -10,6 +10,7 @@ pub struct Config {
     pub download_dir: String,
     pub config_dir: String,
     pub tmp_dir: String,
+    pub db_name: String,
 }
 
 impl Default for Config {
@@ -33,7 +34,7 @@ impl Default for Config {
         let home_dir = env::var("HOME").unwrap_or_else(|_| env::var("USERPROFILE").unwrap());
         let _os: &str = &os;
 
-                let _home_dir = Path::new(&home_dir);
+        let _home_dir = Path::new(&home_dir);
         let config_dir = match _os {
             "Windows" => _home_dir
                 .join("AppData")
@@ -44,17 +45,18 @@ impl Default for Config {
                 .to_string(),
             "Darwin" => _home_dir
                 .join("Library")
-                    .join("Application Support")
-                    .join(&APP_NAME)
-                    .to_str()
-                    .unwrap_or("_")
-                    .to_string(),
-            "Linux" => _home_dir.
-                join(".config")
+                .join("Application Support")
                 .join(&APP_NAME)
                 .to_str()
                 .unwrap_or("_")
                 .to_string(),
+            "Linux" => _home_dir
+                .join(".config")
+                .join(&APP_NAME)
+                .to_str()
+                .unwrap_or("_")
+                .to_string(),
+            _ => String::from("~/"),
         };
 
         let tmp_dir = match _os {
@@ -65,7 +67,8 @@ impl Default for Config {
                 .to_str()
                 .unwrap_or("_")
                 .to_string(),
-                "Darwin" | "Linux" => String::from("/tmp"),
+            "Darwin" | "Linux" => String::from("/tmp"),
+            _ => String::from("/tmp"),
         };
 
         let download_dir = Path::new(&home_dir)
@@ -74,6 +77,7 @@ impl Default for Config {
             .to_str()
             .unwrap_or("_")
             .to_string();
+        let db_name = format!("{}.db", APP_NAME);
 
         Config {
             user: user.to_string(),
@@ -81,7 +85,7 @@ impl Default for Config {
             download_dir,
             config_dir,
             tmp_dir,
+            db_name,
         }
     }
 }
-

@@ -3,7 +3,6 @@
 [workspace]
 members = [
     "shared",
-    "cli",
     "gui"
 ]
 resolver = "2"

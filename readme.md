@@ -10,6 +10,6 @@ This is a personal project to create a cross-platform download manager.
 - [  ] Pause/Cancel/Resume Downloads
 - [-] Download History
 - [  ] Checksum Verification
-- [-] CLI
 - [  ] GUI
 - [  ] Cross-platform compiled binaries
+

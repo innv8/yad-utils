@@ -5,11 +5,11 @@ This is a personal project to create a cross-platform download manager.
 ![First UI concept](docs/yad-v0-concept.png)
 
 ## Features
-- [-] Download Files
-- [-] Categorise Files
+- [x] Download Files
+- [x] Categorise Files
 - [  ] Pause/Cancel/Resume Downloads
-- [  ] Download History
+- [-] Download History
 - [  ] Checksum Verification
-- [  ] CLI
+- [-] CLI
 - [  ] GUI
 - [  ] Cross-platform compiled binaries

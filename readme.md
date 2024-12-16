@@ -1,4 +1,4 @@
-# YAD : Yet Another Downloader
+# YAD : Yet Another Downloader Library
 
 This is a personal project to create a cross-platform download manager.
 
